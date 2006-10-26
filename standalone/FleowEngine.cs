@@ -122,9 +122,10 @@ namespace Banshee.Plugins.Fleow
 				covcor[flank_cap+(int)movdir].angle=-movdir*60+60*(float)Math.Sin((time-1.0f)*Math.PI);
 			}
 			//stop animating
-			else if(Math.Abs(time)>=5.0f)
+			else if(Math.Abs(time)>=1.6f)
 			{
 				time = 0;
+				current+=(int)movdir;
 				covcor_static();
 				motion = false;
 			}
