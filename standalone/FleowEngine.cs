@@ -124,8 +124,22 @@ namespace Banshee.Plugins.Fleow
 			//stop animating
 			else if(Math.Abs(time)>=1.6f)
 			{
+				//must load & unload some covers here
 				time = 0;
+
+				int to_add = reminder(current+(int)movdir*(flank_cap+1),myCovers.Count);
+				int to_del = reminder(current-(int)movdir*(flank_cap),myCovers.Count);
+				//load new texture
+				coverhash.Add(to_add, Ilut.ilutGLLoadImage(myCovers.item[to_add].image));
+				//unload unnecessary one and remove from hash table
+				gl.glDeleteTextures(1, new int[] { (int)coverhash[to_del] } ); 
+				coverhash.Remove(to_del);
+				
+				//changes focused cover
 				current+=(int)movdir;
+				//normalize to prevent out of index case :)
+				current=current%myCovers.Count;
+				
 				covcor_static();
 				motion = false;
 			}
@@ -210,7 +224,7 @@ namespace Banshee.Plugins.Fleow
 			gl.glTranslatef(covcor[index].x,0.0f,-4.0f);
 			gl.glRotatef(covcor[index].angle,0.0f,1.0f,0.0f);
 
-			gl.glBindTexture(gl.GL_TEXTURE_2D, (int)coverhash[current+index-flank_cap]);
+			gl.glBindTexture(gl.GL_TEXTURE_2D, (int)coverhash[reminder(current+index-flank_cap,myCovers.Count)]);
 			gl.glBegin(gl.GL_QUADS);
 
 				gl.glTexCoord2f(-1, 1); gl.glVertex3f( -1.0f, -1.0f, 0.0f);
@@ -273,6 +287,15 @@ namespace Banshee.Plugins.Fleow
 			//Console.WriteLine("Halting Right Rotation!");
 			//doRotate = false;
 		}
+
+		//used instead of C# % modulo op as it gives negative values
+		int reminder(int a, int b)
+		{
+			a = a%b;
+			if(a<0)return a+b;
+			return a;
+		}
+
 
 	}
 }
