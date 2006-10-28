@@ -262,10 +262,13 @@ namespace Banshee.Plugins.Fleow
 
 		public void OnRotRPress (object o, System.EventArgs e)
 		{
-			motion = true;
-			movdir = -1;
-			
-			GLib.Timeout.Add (50, new GLib.TimeoutHandler (this.covcor_animate));
+			if(time==0)
+			{
+				motion = true;
+				movdir = -1;
+				
+				GLib.Timeout.Add (50, new GLib.TimeoutHandler (this.covcor_animate));
+			}
 		}
 
 		public void OnRotLRelease (object o, EventArgs e)
@@ -276,10 +279,13 @@ namespace Banshee.Plugins.Fleow
 
 		public void OnRotLPress (object o, System.EventArgs e)
 		{
-			motion = true;
-			movdir = 1;
-
-			GLib.Timeout.Add (50, new GLib.TimeoutHandler (this.covcor_animate));
+			if(time==0)
+			{
+				motion = true;
+				movdir = 1;
+				
+				GLib.Timeout.Add (50, new GLib.TimeoutHandler (this.covcor_animate));
+			}
 		}
 
 		public void OnRotRRelease (object o, EventArgs e)
