@@ -20,6 +20,7 @@ namespace Banshee.Plugins.Fleow
 	public struct VCover
 	{
 		public float x;
+		public float y;
 		public float angle;
 	}	
 	
@@ -83,6 +84,7 @@ namespace Banshee.Plugins.Fleow
 		{
 			//central cover cordinates
 			covcor[flank_cap].x = 0;
+			covcor[flank_cap].y = 0;
 			covcor[flank_cap].angle = 0;
 
 			for(int i=1;i<flank_cap;i++)
@@ -90,6 +92,7 @@ namespace Banshee.Plugins.Fleow
 				//left ones
 				covcor[flank_cap-i].x = -1.0f-0.2f*i;
 				covcor[flank_cap-i].angle = 60;
+				covcor[flank_cap-i].y = covcor[flank_cap+i].y = 0;
 				//right ones
 				covcor[flank_cap+i].x = 1.0f+0.2f*i;
 				covcor[flank_cap+i].angle = -60f;
@@ -109,20 +112,42 @@ namespace Banshee.Plugins.Fleow
 				covcor[flank_cap].angle=60*(float)Math.Sin(time*Math.PI);				
 			}
 			//phase 2 - moving flanks
-			else if(Math.Abs(time)<=1.0f)
+			else if(Math.Abs(time)<=1.1f)
 			{
 				for(int i=1;i<2*flank_cap;i++)
 					covcor[i].x -= movdir*0.04f;	// distance step = "distance" divided by "how many time steps";
 			}
 			//phase 3 - centring a new cover
-			else if(Math.Abs(time)<=1.5f)
+			else if(Math.Abs(time)<=1.6f)
 			{
-				//simple position time dependency cos(PI*t)
-				covcor[flank_cap+(int)movdir].x=movdir*1.0f-1.0f*(float)Math.Sin((time-1.0f)*Math.PI);
-				covcor[flank_cap+(int)movdir].angle=-movdir*60+60*(float)Math.Sin((time-1.0f)*Math.PI);
+				//simple position time dependency
+				covcor[flank_cap+(int)movdir].x-=movdir*0.2f;
+				covcor[flank_cap+(int)movdir].angle+=movdir*12f;
+
+				if(movdir<0)
+				{
+					covcor[flank_cap*2-1].y+=0.3f;
+				}
+				else
+				{
+					covcor[1].y+=0.3f;
+				}
+			}
+			//phase 4 - continue vanishing
+			else if(Math.Abs(time)<=2.0f)
+			{
+
+				if(movdir<0)
+				{
+					covcor[flank_cap*2-1].y+=0.3f;
+				}
+				else
+				{
+					covcor[1].y+=0.3f;
+				}
 			}
 			//stop animating
-			else if(Math.Abs(time)>=1.6f)
+			else if(Math.Abs(time)>=2.1f)
 			{
 				//must load & unload some covers here
 				time = 0;
@@ -221,7 +246,7 @@ namespace Banshee.Plugins.Fleow
 		{
 			//Draw Cover wireframe + texture
 			gl.glLoadIdentity();
-			gl.glTranslatef(covcor[index].x,0.0f,-4.0f);
+			gl.glTranslatef(covcor[index].x,covcor[index].y,-4.0f);
 			gl.glRotatef(covcor[index].angle,0.0f,1.0f,0.0f);
 
 			gl.glBindTexture(gl.GL_TEXTURE_2D, (int)coverhash[reminder(current+index-flank_cap,myCovers.Count)]);
