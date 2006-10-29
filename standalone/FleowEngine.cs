@@ -134,7 +134,7 @@ namespace Banshee.Plugins.Fleow
 				}
 			}
 			//phase 4 - continue vanishing
-			else if(Math.Abs(time)<=2.0f)
+			else if(Math.Abs(time)<=2.2f)
 			{
 
 				if(movdir<0)
@@ -147,10 +147,10 @@ namespace Banshee.Plugins.Fleow
 				}
 			}
 			//stop animating
-			else if(Math.Abs(time)>=2.1f)
+			else if(Math.Abs(time)==2.3f)
 			{
 				//must load & unload some covers here
-				time = 0;
+				
 
 				int to_add = reminder(current+(int)movdir*(flank_cap+1),myCovers.Count);
 				int to_del = reminder(current-(int)movdir*(flank_cap),myCovers.Count);
@@ -166,6 +166,34 @@ namespace Banshee.Plugins.Fleow
 				current=current%myCovers.Count;
 				
 				covcor_static();
+				//appearing
+				if(movdir>0)
+				{
+					covcor[flank_cap*2-1].y=2.4f;
+				}
+				else
+				{
+					covcor[1].y=2.4f;
+				}
+				
+			}
+			//appearing
+			else if(Math.Abs(time)<=3.1f)
+			{
+				//appearing
+				if(movdir>0)
+				{
+					covcor[flank_cap*2-1].y-=0.3f;
+				}
+				else
+				{
+					covcor[1].y-=0.3f;
+				}
+			}
+			//end animating
+			else if(Math.Abs(time)>3.2f)
+			{
+				time = 0;
 				motion = false;
 			}
 			
