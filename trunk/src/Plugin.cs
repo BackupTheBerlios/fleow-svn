@@ -41,6 +41,8 @@ namespace Banshee.Plugins.Fleow
             timeout_id = GLib.Timeout.Add(5000, OnTimeout);
             source = new SampleSource();
             SourceManager.AddSource(source);
+            
+            InstallInterfaceElements();
         }
         
         // optional, this is a virtual override, only
@@ -53,7 +55,6 @@ namespace Banshee.Plugins.Fleow
             GLib.Source.Remove(timeout_id);
             timeout_id = 0;
             SourceManager.RemoveSource(source);
-				InstallInterfaceElements();
         }
         
         // optional, this is a virtual override, only 
