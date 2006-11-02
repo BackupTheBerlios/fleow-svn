@@ -68,7 +68,7 @@ namespace Banshee.Plugins.Fleow
 			this.ConfigureEvent += OnConfigure;
 
 			//connecting with cover database
-			myCovers = new CoverList("/home/vishna/covers.xml");
+			myCovers = new CoverList();
 			current = myCovers.Count/2;
 
 			//creating Hashtable instance
@@ -155,7 +155,7 @@ namespace Banshee.Plugins.Fleow
 				int to_add = reminder(current+(int)movdir*(flank_cap+1),myCovers.Count);
 				int to_del = reminder(current-(int)movdir*(flank_cap),myCovers.Count);
 				//load new texture
-				coverhash.Add(to_add, Ilut.ilutGLLoadImage(myCovers.item[to_add].image));
+				coverhash.Add(to_add, Ilut.ilutGLLoadImage(((Cover)myCovers[to_add]).image));
 				//unload unnecessary one and remove from hash table
 				gl.glDeleteTextures(1, new int[] { (int)coverhash[to_del] } ); 
 				coverhash.Remove(to_del);
@@ -304,11 +304,11 @@ namespace Banshee.Plugins.Fleow
 				
 				//here comes hashing, it took me a while to understand what i did
 				//call (int)coverhash[cover_index] to get approprioate index of loaded texture
-				coverhash.Add(current, Ilut.ilutGLLoadImage(myCovers.item[current].image));
+				coverhash.Add(current, Ilut.ilutGLLoadImage(((Cover)myCovers[current]).image));
 				for(int i=1;i<flank_cap+1;i++)
 				{
-					coverhash.Add(current+i, Ilut.ilutGLLoadImage(myCovers.item[current+i].image));
-					coverhash.Add(current-i, Ilut.ilutGLLoadImage(myCovers.item[current-i].image));
+					coverhash.Add(current+i, Ilut.ilutGLLoadImage(((Cover)myCovers[current+i]).image));
+					coverhash.Add(current-i, Ilut.ilutGLLoadImage(((Cover)myCovers[current-i]).image));
 				}
 			}
 		}

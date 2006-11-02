@@ -1,10 +1,10 @@
-MCS_FLAGS = -debug -r:/usr/lib/mono/gtkglarea-sharp/gtkglarea-sharp.dll -pkg:tao-opengl-glu -r:/usr/lib/mono/tao/Tao.DevIl.dll
+MCS_FLAGS = -debug -r:/usr/lib/mono/gtkglarea-sharp/gtkglarea-sharp.dll -pkg:tao-opengl-glu -r:/usr/lib/mono/tao/Tao.DevIl.dll -r:System.Data
 ASSEMBLY = Fleow.dll
 SOURCES = \
 	$(srcdir)/Plugin.cs \
 	$(srcdir)/FleowPane.cs \
 	$(srcdir)/FleowEngine.cs \
-	$(srcdir)/FleowXml.cs
+	$(srcdir)/FleowDatabase.cs
 
 plugindir = $(PLUGINDIR)
 plugin_SCRIPTS = $(ASSEMBLY) $(ASSEMBLY).mdb
