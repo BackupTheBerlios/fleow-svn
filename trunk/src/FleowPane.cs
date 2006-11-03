@@ -8,20 +8,7 @@ namespace Banshee.Plugins.Fleow
 	public class FleowPane : Frame
 	{
 		//OpenGL _Engine_ class containing all render scene functions, initalizations & bindings
-		
 		Engine myEngine;
-		
-		/*public static int Main (string[] argc)
-		{
-			Gtk.Application.Init ();
-			
-			new Fleow();
-
-			// Go, dog, go!
-			Gtk.Application.Run ();
-
-			return 1;
-		}*/
 		
 		public FleowPane()
 		{

@@ -5,7 +5,7 @@ using System.Data;
 namespace Banshee.Plugins.Fleow
 {
 	//contains info of a cover
-	public class Cover
+	public class Cover : GLCover
 	{
 		public string artist;
 		public string title;
@@ -16,6 +16,7 @@ namespace Banshee.Plugins.Fleow
 		public Cover(string ASIN)
 		{
 				image = System.Environment.GetEnvironmentVariable("HOME") + "/.gnome2/banshee/covers/" + ASIN + ".jpg";
+				LoadTexture(image);
 		}
 	}
 	
@@ -27,7 +28,11 @@ namespace Banshee.Plugins.Fleow
 			IDataReader reader = Banshee.Base.Globals.Library.Db.Query("SELECT DISTINCT ASIN,Artist FROM Tracks ORDER BY Artist");
         	while(reader.Read()) 
 			{
-				Add(new Cover((string)reader["ASIN"]));
+				string tmp=(string)reader["ASIN"];
+				if(tmp!="NOTFOUND" && !string.IsNullOrEmpty(tmp) )
+				{
+					Add(new Cover(tmp));
+				}
 			}	
 		}
 	}
