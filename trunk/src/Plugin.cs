@@ -70,7 +70,7 @@ namespace Banshee.Plugins.Fleow
 			switch (args.Event)
 			{
 				case PlayerEngineEvent.StartOfStream:
-					//sth in the future
+					fleow_pane.myEngine.MoveToCover(PlayerEngineCore.CurrentTrack.DisplayArtist,PlayerEngineCore.CurrentTrack.DisplayAlbum);
 				break;
 			}
 		}

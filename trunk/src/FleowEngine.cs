@@ -16,15 +16,6 @@ using glu=Tao.OpenGl.Glu;
 
 namespace Banshee.Plugins.Fleow
 {
-	//class describing cover position in 3D space
-	public struct CovCor
-	{
-		public float x;
-		public float y;
-		public float angle;
-		public bool hidden;
-	}
-
 	//openGL data of a cover
 	public class GLCover
 	{
@@ -50,17 +41,10 @@ namespace Banshee.Plugins.Fleow
 	//inheriting Coverlist and adding all three dimensional stuff
 	public class GLCoverList : CoverList
 	{
-		public int current;					//currently selected cover from CoverList
-
 		public GLCoverList() : base()
 		{
 			current = Count/2;
 			AlignToGrid();
-		}
-
-		public Cover item(int index)
-		{
-			return (Cover)this[index];
 		}
 
 		public void AlignToGrid()
@@ -109,7 +93,7 @@ namespace Banshee.Plugins.Fleow
 			(int)GtkGL._GDK_GL_CONFIGS.None,
 	  	};
 
-		private GLCoverList myCovers;		//covers gabbed from banshee database
+		public GLCoverList myCovers;		//covers gabbed from banshee database
 
 		//class constructor
 		public Engine() : base(attrlist)
@@ -260,6 +244,12 @@ namespace Banshee.Plugins.Fleow
 			//doRotate = false;
 		}
 
+		public void MoveToCover (string artist, string albumtitle)
+		{
+			myCovers.current = myCovers.Search(artist,albumtitle);
+			myCovers.AlignToGrid();
+			this.QueueDraw();
+		}
 
 	}
 }
