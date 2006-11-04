@@ -58,7 +58,7 @@ namespace Banshee.Plugins.Fleow
 			}
 
 			//center
-			item(current).SetPos(0,0,-3.5f,0);
+			item(current).SetPos(0,0,-3.0f,0);
 		}
 
 		public void Diagnoze()
@@ -164,6 +164,11 @@ namespace Banshee.Plugins.Fleow
 			
 			// Clear The Screen And The Depth Buffer
 			gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT);
+			gl.glLoadIdentity();
+			
+			// Camera view
+			gl.glRotatef(25,1.0f,0.0f,0.0f);
+			gl.glTranslatef(0.0f,-1.5f,-0.4f);
 
 			if(myCovers!=null)
 			{
@@ -177,7 +182,7 @@ namespace Banshee.Plugins.Fleow
 		void DrawCover (Cover cover)
 		{
 			//Draw Cover wireframe + texture
-			gl.glLoadIdentity();
+			gl.glPushMatrix();
 			gl.glTranslatef(cover.x,cover.y,cover.z);
 			gl.glRotatef(cover.angle,0.0f,1.0f,0.0f);
 
@@ -190,6 +195,7 @@ namespace Banshee.Plugins.Fleow
 				gl.glTexCoord2f(-1, 0); gl.glVertex3f( -1.0f, 1.0f, 0.0f);
 			
 			gl.glEnd();
+			gl.glPopMatrix();
 		}
 
 		private void LoadTextures()
@@ -198,7 +204,7 @@ namespace Banshee.Plugins.Fleow
 			Il.ilInit();
 			Ilut.ilutInit();
 
-			myCovers = new GLCoverList(); //test
+			myCovers = new GLCoverList();
 		}
 
 		// --------------------------------------------------------------- //
