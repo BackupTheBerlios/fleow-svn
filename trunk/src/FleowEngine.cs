@@ -16,6 +16,27 @@ using glu=Tao.OpenGl.Glu;
 
 namespace Banshee.Plugins.Fleow
 {
+	//Camera class and its static members for view manipulation
+	public class Cam
+	{
+		static float cam_zdistance = -4.0f;
+		static float cam_ydistance = -1.23f;
+		static float cam_angle = 18;
+
+		public static void SetPos(float _cam_angle,float _cam_distance)
+		{
+			cam_angle = _cam_angle;
+			cam_zdistance = _cam_distance;
+			cam_ydistance = (float)Math.Sin(cam_angle*0.0174)*cam_zdistance;
+		}
+
+		public static void SetView()
+		{
+			gl.glRotatef(cam_angle,1.0f,0.0f,0.0f);
+			gl.glTranslatef(0.0f,cam_ydistance,cam_zdistance);
+		}
+	}
+	
 	//openGL data of a cover
 	public class GLCover
 	{
@@ -52,13 +73,13 @@ namespace Banshee.Plugins.Fleow
 			for(int i=0;i<Count;i++)
 			{
 				if(i<current)
-					item(i).SetPos(-1.2f-0.2f*(current-i),0,-4f,60f);
+					item(i).SetPos(-1.2f-0.2f*(current-i),0,-0.5f,60f);
 				else
-					item(i).SetPos(1.2f+.2f*(i-current),0,-4f,-60f);
+					item(i).SetPos(1.2f+.2f*(i-current),0,-0.5f,-60f);
 			}
 
 			//center
-			item(current).SetPos(0,0,-3.0f,0);
+			item(current).SetPos(0,0,0,0);
 		}
 
 		public void Diagnoze()
@@ -166,9 +187,8 @@ namespace Banshee.Plugins.Fleow
 			gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT);
 			gl.glLoadIdentity();
 			
-			// Camera view
-			gl.glRotatef(25,1.0f,0.0f,0.0f);
-			gl.glTranslatef(0.0f,-1.5f,-0.4f);
+			// Camera set view
+			Cam.SetView();
 
 			if(myCovers!=null)
 			{
