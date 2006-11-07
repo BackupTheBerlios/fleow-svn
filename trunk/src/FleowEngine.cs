@@ -16,7 +16,7 @@ using glu=Tao.OpenGl.Glu;
 
 namespace Banshee.Plugins.Fleow
 {
-	//Camera class and its static members for view manipulation
+	//Camera View Manipulation Class (static members)
 	public class Cam
 	{
 		static float cam_zdistance = -4.0f;
@@ -37,7 +37,7 @@ namespace Banshee.Plugins.Fleow
 		}
 	}
 	
-	//openGL data of a cover
+	//OpenGL Cover Data Class
 	public class GLCover
 	{
 		public float x,y,z;
@@ -59,7 +59,7 @@ namespace Banshee.Plugins.Fleow
 		}
 	}
 
-	//inheriting Coverlist and adding all three dimensional stuff
+	//OpenGL Cover List Class
 	public class GLCoverList : CoverList
 	{
 		public GLCoverList() : base()
@@ -78,19 +78,16 @@ namespace Banshee.Plugins.Fleow
 					item(i).SetPos(1.2f+.2f*(i-current),0,-0.5f,-60f);
 			}
 
-			//center
-			item(current).SetPos(0,0,0,0);
+			item(current).SetPos(0,0,0.5f,0);
 		}
 
-		public void Diagnoze()
+		public void PositionByStepsLeft(int steps)
 		{
-			Console.Write("Fleow Diagnoze\n");
-			for(int i=0;i<Count;i++)
-				Console.Write(item(i).image+":"+item(i).texture+":"+item(i).x+":"+item(i).y+":"+item(i).z+":"+item(i).angle+"\n");
+			//takes steps and postitions cover depending on how many animation steps there are left to the end
 		}
 	}
 	
-	//widget inherited from GLArea, therefore can be easilly added as widget in gtk apps
+	//Class inherited from GLArea, therefore can be easilly added as widget in gtk apps
 	public class Engine : GLArea
 	{
 		/*	attrList
@@ -105,13 +102,13 @@ namespace Banshee.Plugins.Fleow
 		 */
 		   
 		static System.Int32[] attrlist = {
-			(int)GtkGL._GDK_GL_CONFIGS.Rgba,
+		(int)GtkGL._GDK_GL_CONFIGS.Rgba,
 	   	(int)GtkGL._GDK_GL_CONFIGS.RedSize,1,
 	   	(int)GtkGL._GDK_GL_CONFIGS.GreenSize,1,
 	   	(int)GtkGL._GDK_GL_CONFIGS.BlueSize,1,
 	   	(int)GtkGL._GDK_GL_CONFIGS.DepthSize,1,
-			(int)GtkGL._GDK_GL_CONFIGS.Doublebuffer,
-			(int)GtkGL._GDK_GL_CONFIGS.None,
+		(int)GtkGL._GDK_GL_CONFIGS.Doublebuffer,
+		(int)GtkGL._GDK_GL_CONFIGS.None,
 	  	};
 
 		public GLCoverList myCovers;		//covers gabbed from banshee database
@@ -224,7 +221,7 @@ namespace Banshee.Plugins.Fleow
 			Il.ilInit();
 			Ilut.ilutInit();
 
-			myCovers = new GLCoverList();
+			myCovers = new GLCoverList();	//this needs probably backgrounding+optimization (as takes some time to create)
 		}
 
 		// --------------------------------------------------------------- //
