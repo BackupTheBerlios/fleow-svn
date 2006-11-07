@@ -1,4 +1,4 @@
-MCS_FLAGS = -debug -r:/usr/lib/mono/gtkglarea-sharp/gtkglarea-sharp.dll -pkg:tao-opengl-glu -r:/usr/lib/mono/tao/Tao.DevIl.dll -r:System.Data
+MCS_FLAGS = -debug -pkg:tao-opengl-glu,tao-devil,gtkglarea-sharp -r:System.Data
 ASSEMBLY = Fleow.dll
 SOURCES = \
 	$(srcdir)/Plugin.cs \
