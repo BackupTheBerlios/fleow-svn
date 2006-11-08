@@ -62,10 +62,26 @@ namespace Banshee.Plugins.Fleow
 	//OpenGL Cover List Class
 	public class GLCoverList : CoverList
 	{
+		int target = 0;		//target index
+		int offset = 0;		//target index
+		static float c = 1.2f;		//center distance
+		static float d = 0.2f;		//cover  distance
+		static float angle = 60;	//default angle
+		static float depth = 0.5f;	//default depth
+		static int spf = 25;		//steps per flip
+
 		public GLCoverList() : base()
 		{
 			current = Count/2;
 			AlignToGrid();
+		}
+
+		public void MakeNewTarget(int offset)
+		{
+			target = current + offset;
+			if(target<0) target = 0;
+			else if(target>=Count) target = (Count-1);
+			this.offset = target - current;
 		}
 
 		public void AlignToGrid()
@@ -73,17 +89,58 @@ namespace Banshee.Plugins.Fleow
 			for(int i=0;i<Count;i++)
 			{
 				if(i<current)
-					item(i).SetPos(-1.2f-0.2f*(current-i),0,-0.5f,60f);
+					item(i).SetPos(-c-d*(current-i),0,-depth,angle);
 				else
-					item(i).SetPos(1.2f+.2f*(i-current),0,-0.5f,-60f);
+					item(i).SetPos(c+d*(i-current),0,-depth,-angle);
 			}
 
-			item(current).SetPos(0,0,0.5f,0);
+			item(current).SetPos(0,0,depth,0);
 		}
 
-		public void PositionByStepsLeft(int steps)
+		//postitions cover depending on animation step, should be followed by MakeNewTarget
+		public bool AlignByStep(int step)
 		{
-			//takes steps and postitions cover depending on how many animation steps there are left to the end
+			if((step/spf)!=Math.Abs(offset))
+			{
+				for(int i=0;i<Count;i++)
+				{
+					NewPos(item(i));
+				}
+			}
+			else
+			{
+				current = target;
+				AlignToGrid();
+				return false;
+			}
+			return true;
+		}
+
+		public void NewPos(GLCover cov)
+		{
+			float dir = -Math.Sign(offset);
+			float move = dir*d/(float)spf;
+			float mov_angle = 0;
+			float mov_z = 0;
+			if(Math.Abs(cov.x)<(c+d))
+			{
+				move *= (c+d)/d;
+				if(dir>0)
+				{
+					mov_angle = -angle/(float)spf;
+					mov_z = -2*depth/(float)spf;
+					if(cov.x<0)mov_z=-mov_z;
+				}
+				else
+				{
+					mov_angle = angle/(float)spf;
+					mov_z = -2*depth/(float)spf;
+					if(cov.x>0)mov_z=-mov_z;
+				}
+			}
+			cov.x += move;
+			cov.z += mov_z;
+			cov.angle += mov_angle;
 		}
 	}
 	
@@ -112,6 +169,7 @@ namespace Banshee.Plugins.Fleow
 	  	};
 
 		public GLCoverList myCovers;		//covers gabbed from banshee database
+		private int step=0;				//steps
 
 		//class constructor
 		public Engine() : base(attrlist)
@@ -233,14 +291,23 @@ namespace Banshee.Plugins.Fleow
 
 		// --------------------------------------------------------------- //
 
+		private bool Flip()
+		{
+			this.QueueDraw();
+			if(!myCovers.AlignByStep(step++))
+			{
+				step = 0;
+				return false;
+			}
+			else return true;
+		}
+
 		public void OnRotRPress (object o, System.EventArgs e)
 		{
 			if((myCovers.current+1)<myCovers.Count)
 			{
-				myCovers.current++;
-				myCovers.AlignToGrid();
-		
-				this.QueueDraw();
+				myCovers.MakeNewTarget(1);
+				GLib.Timeout.Add (10, new GLib.TimeoutHandler (this.Flip));
 			}
 		}
 
@@ -254,10 +321,8 @@ namespace Banshee.Plugins.Fleow
 		{
 			if(myCovers.current>0)
 			{
-				myCovers.current--;
-				myCovers.AlignToGrid();
-
-				this.QueueDraw();
+				myCovers.MakeNewTarget(-1);
+				GLib.Timeout.Add (10, new GLib.TimeoutHandler (this.Flip));
 			}		
 		}
 
@@ -269,9 +334,13 @@ namespace Banshee.Plugins.Fleow
 
 		public void MoveToCover (string artist, string albumtitle)
 		{
-			myCovers.current = myCovers.Search(artist,albumtitle);
-			myCovers.AlignToGrid();
-			this.QueueDraw();
+			int offset = myCovers.Search(artist,albumtitle) - myCovers.current;
+			if(offset!=0)
+			{
+				myCovers.MakeNewTarget(offset);
+				uint period = (offset>5) ? 2 : (uint)Math.Abs(10/offset);
+				GLib.Timeout.Add (period, new GLib.TimeoutHandler (this.Flip));
+			}
 		}
 
 	}
