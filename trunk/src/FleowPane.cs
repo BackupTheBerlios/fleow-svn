@@ -41,9 +41,8 @@ namespace Banshee.Plugins.Fleow
 			// This button quits the program
 			Button btn = new Button ("Play");		
 		
-			// Bind the key press event to the OnKeyPress method
-			//btn.KeyPressEvent += OnKeyPress;
-			//btn.Clicked += OnUnrealized;
+			// Bind the key press event to the OnPlayPress method
+			btn.Pressed += myEngine.OnPlayPress;
 
 			hb.PackStart (btn, true, true, 0);
 		

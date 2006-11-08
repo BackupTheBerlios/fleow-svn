@@ -13,6 +13,7 @@ using Tao.DevIl;
 using gl=Tao.OpenGl.Gl;
 using glu=Tao.OpenGl.Glu;
 
+using Banshee.Base;
 
 namespace Banshee.Plugins.Fleow
 {
@@ -334,6 +335,12 @@ namespace Banshee.Plugins.Fleow
 		{
 			//Console.WriteLine("Halting Right Rotation!");
 			//doRotate = false;
+		}
+
+		public void OnPlayPress (object o, EventArgs e)
+		{
+			int track = CoverList.GetTrackId(myCovers.item(myCovers.current));
+			if(track>0)PlayerEngineCore.OpenPlay(Globals.Library.GetTrack(track));
 		}
 
 		public void MoveToCover (string artist, string albumtitle)

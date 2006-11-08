@@ -40,6 +40,12 @@ namespace Banshee.Plugins.Fleow
 			}	
 		}
 
+		public static int GetTrackId(Cover c)
+        {
+            object result = Banshee.Base.Globals.Library.Db.QuerySingle("SELECT TrackId FROM Tracks WHERE Artist LIKE \""+c.artist+"\" AND AlbumTitle LIKE \""+c.albumtitle+"\" LIMIT 1");
+            return result == null ? -1 : (int)result;
+        }
+
 		public Cover item(int index)
 		{
 			return (Cover)this[index];
