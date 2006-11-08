@@ -125,18 +125,9 @@ namespace Banshee.Plugins.Fleow
 			if(Math.Abs(cov.x)<(c+d))
 			{
 				move *= (c+d)/d;
-				if(dir>0)
-				{
-					mov_angle = -angle/(float)spf;
-					mov_z = -2*depth/(float)spf;
-					if(cov.x<0)mov_z=-mov_z;
-				}
-				else
-				{
-					mov_angle = angle/(float)spf;
-					mov_z = -2*depth/(float)spf;
-					if(cov.x>0)mov_z=-mov_z;
-				}
+				mov_angle = -dir*angle/(float)spf;
+				mov_z = -2*depth/(float)spf;
+				if(cov.x*dir<0)mov_z=-mov_z;
 			}
 			cov.x += move;
 			cov.z += mov_z;
@@ -170,6 +161,9 @@ namespace Banshee.Plugins.Fleow
 
 		public GLCoverList myCovers;		//covers gabbed from banshee database
 		private int step=0;				//steps
+		float[] LightAmbient= { 0.2f, 0.2f, 0.2f, 1.0f };
+		float[] LightDiffuse= { 1.0f, 1.0f, 1.0f, 1.0f }; 
+		float[] LightPosition= { 0.0f, 0.0f, 0.75f, 1.0f };
 
 		//class constructor
 		public Engine() : base(attrlist)
@@ -215,9 +209,18 @@ namespace Banshee.Plugins.Fleow
 			gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);			// Black Background
 			gl.glClearDepth(1.0f);								// Depth Buffer Setup
 			gl.glEnable(gl.GL_DEPTH_TEST);						// Enables Depth Testing
+			gl.glEnable(gl.GL_POLYGON_SMOOTH);					// Enables Antialiasing for polygons
 			gl.glDepthFunc(gl.GL_LEQUAL);						// The Type Of Depth Test To Do
 			// Really Nice Perspective Calculations
-			gl.glHint(gl.GL_PERSPECTIVE_CORRECTION_HINT, gl.GL_NICEST);	
+			gl.glHint(gl.GL_PERSPECTIVE_CORRECTION_HINT, gl.GL_NICEST);
+			gl.glHint(gl.GL_POLYGON_SMOOTH_HINT, gl.GL_NICEST);
+
+			//light on	
+			gl.glLightfv(gl.GL_LIGHT1, gl.GL_AMBIENT, LightAmbient);	
+			gl.glLightfv(gl.GL_LIGHT1, gl.GL_DIFFUSE, LightDiffuse);
+			gl.glLightfv(gl.GL_LIGHT1, gl.GL_POSITION,LightPosition);
+			gl.glEnable(gl.GL_LIGHT1);
+			gl.glEnable(gl.GL_LIGHTING);	
 			
 			return true;
 		}
@@ -264,6 +267,7 @@ namespace Banshee.Plugins.Fleow
 			gl.glBindTexture(gl.GL_TEXTURE_2D, cover.texture);
 			gl.glBegin(gl.GL_QUADS);
 
+				gl.glNormal3f( 0.0f, 0.0f, 1.0f);
 				gl.glTexCoord2f(-1, 1); gl.glVertex3f( -1.0f, -1.0f, 0.0f);
 				gl.glTexCoord2f(0, 1); gl.glVertex3f( 1.0f, -1.0f, 0.0f);
 				gl.glTexCoord2f(0, 0); gl.glVertex3f( 1.0f, 1.0f, 0.0f);
