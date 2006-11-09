@@ -64,7 +64,7 @@ namespace Banshee.Plugins.Fleow
 	public class GLCoverList : CoverList
 	{
 		int target = 0;		//target index
-		int offset = 0;		//target index
+		public int offset = 0;		//target index
 		static float c = 1.2f;		//center distance
 		static float d = 0.2f;		//cover  distance
 		static float angle = 60;	//default angle
@@ -298,13 +298,17 @@ namespace Banshee.Plugins.Fleow
 
 		private bool Flip()
 		{
-			this.QueueDraw();
-			if(!myCovers.AlignByStep(step++))
+			for(int i=0;i<Math.Abs(myCovers.offset);i++)
 			{
-				step = 0;
-				return false;
+				if(!myCovers.AlignByStep(step++))
+				{
+					step = 0;
+					this.QueueDraw();
+					return false;
+				}
 			}
-			else return true;
+			this.QueueDraw();
+			return true;
 		}
 
 		public void OnRotRPress (object o, System.EventArgs e)
@@ -349,8 +353,8 @@ namespace Banshee.Plugins.Fleow
 			if(offset!=0)
 			{
 				myCovers.MakeNewTarget(offset);
-				uint period = (Math.Abs(offset)>5) ? 2 : (uint)Math.Abs(10/offset);
-				GLib.Timeout.Add (period, new GLib.TimeoutHandler (this.Flip));
+				//uint period = (Math.Abs(offset)>5) ? 2 : (uint)Math.Abs(10/offset);
+				GLib.Timeout.Add (10, new GLib.TimeoutHandler (this.Flip));
 			}
 		}
 
