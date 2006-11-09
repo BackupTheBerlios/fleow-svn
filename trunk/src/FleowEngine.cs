@@ -349,7 +349,7 @@ namespace Banshee.Plugins.Fleow
 			if(offset!=0)
 			{
 				myCovers.MakeNewTarget(offset);
-				uint period = (offset>5) ? 2 : (uint)Math.Abs(10/offset);
+				uint period = (Math.Abs(offset)>5) ? 2 : (uint)Math.Abs(10/offset);
 				GLib.Timeout.Add (period, new GLib.TimeoutHandler (this.Flip));
 			}
 		}
