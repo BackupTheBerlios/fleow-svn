@@ -45,6 +45,7 @@ namespace Banshee.Plugins.Fleow
 		protected override void PluginDispose()
 		{
 			Console.WriteLine("Disposing Fleow Plugin");
+			PlayerEngineCore.EventChanged -= OnPlayerEngineEventChanged;
 		}
 
 		// --------------------------------------------------------------- //

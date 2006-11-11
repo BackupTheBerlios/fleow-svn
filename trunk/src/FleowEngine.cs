@@ -51,6 +51,20 @@ namespace Banshee.Plugins.Fleow
 			texture = Ilut.ilutGLLoadImage(filename);
 		}
 
+		public void UnloadTexture()
+		{
+			if(texture!=-1)
+			{
+				gl.glDeleteTextures(1, new int[] { (int)texture } ); 
+				texture = -1;
+			}
+		}
+
+		~GLCover()
+		{
+			UnloadTexture();
+		}
+
 		public void SetPos(float x, float y, float z, float angle)
 		{
 			this.x = x;
