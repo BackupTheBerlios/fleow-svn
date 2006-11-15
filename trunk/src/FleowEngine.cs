@@ -95,13 +95,14 @@ namespace Banshee.Plugins.Fleow
 	//OpenGL Cover List Class
 	public class GLCoverList : CoverList
 	{
-		int target = 0;		//target index
-		public int offset = 0;		//target index
-		static float c = 1.2f;		//center distance
-		static float d = 0.2f;		//cover  distance
-		static float angle = 60;	//default angle
-		static float depth = 0.5f;	//default depth
-		static int spf = 25;		//steps per flip
+		int target = 0;			// target index
+		public int offset = 0;		// target index
+		static float c = 1.2f;		// center distance
+		static float d = 0.2f;		// cover  distance
+		static float angle = 60;	// default angle
+		static float depth = 0.5f;	// default depth
+		static int spf = 25;		// steps per flip
+		static int step = 0;		// step
 
 		public GLCoverList() : base()
 		{
@@ -131,19 +132,19 @@ namespace Banshee.Plugins.Fleow
 		}
 
 		//postitions cover depending on animation step, should be followed by MakeNewTarget
-		public bool AlignByStep(int step)
+		public bool AlignByStep()
 		{
-			if((step/spf)!=Math.Abs(offset))
+			if((step/spf)!=1)
 			{
 				for(int i=0;i<Count;i++)
-				{
 					NewPos(item(i));
-				}
+				step++;
 			}
 			else
 			{
 				current = target;
 				AlignToGrid();
+				step=0;
 				return false;
 			}
 			return true;
@@ -151,15 +152,16 @@ namespace Banshee.Plugins.Fleow
 
 		public void NewPos(GLCover cov)
 		{
+			int speed = Math.Abs(offset);
 			float dir = -Math.Sign(offset);
-			float move = dir*d/(float)spf;
+			float move = speed*dir*d/(float)spf;
 			float mov_angle = 0;
 			float mov_z = 0;
 			if(Math.Abs(cov.x)<(c+d))
 			{
 				move *= (c+d)/d;
-				mov_angle = -dir*angle/(float)spf;
-				mov_z = -2*depth/(float)spf;
+				mov_angle = -speed*dir*angle/(float)spf;
+				mov_z = -2*speed*depth/(float)spf;
 				if(cov.x*dir<0)mov_z=-mov_z;
 			}
 			cov.x += move;
@@ -193,7 +195,6 @@ namespace Banshee.Plugins.Fleow
 	  	};
 
 		public GLCoverList myCovers;		//covers gabbed from banshee database
-		private int step=0;				//steps
 
 		//class constructor
 		public Engine() : base(attrlist)
@@ -321,17 +322,9 @@ namespace Banshee.Plugins.Fleow
 
 		private bool Flip()
 		{
-			for(int i=0;i<Math.Abs(myCovers.offset);i++)
-			{
-				if(!myCovers.AlignByStep(step++))
-				{
-					step = 0;
-					this.QueueDraw();
-					return false;
-				}
-			}
+			bool ret = myCovers.AlignByStep();
 			this.QueueDraw();
-			return true;
+			return ret;
 		}
 
 		public void OnRotRPress (object o, System.EventArgs e)
