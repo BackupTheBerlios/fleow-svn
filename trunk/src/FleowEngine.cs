@@ -18,7 +18,7 @@ using Banshee.Base;
 namespace Banshee.Plugins.Fleow
 {
 	//Camera View Manipulation Class (static members)
-	public class Cam
+	public static class Cam
 	{
 		static float cam_zdistance = -4.0f;
 		static float cam_ydistance = -1.23f;
@@ -36,6 +36,24 @@ namespace Banshee.Plugins.Fleow
 			gl.glRotatef(cam_angle,1.0f,0.0f,0.0f);
 			gl.glTranslatef(0.0f,cam_ydistance,cam_zdistance);
 		}
+	}
+
+	//Scene Lights
+	public static class Lights
+	{
+		static float[] LightAmbient= { 0.2f, 0.2f, 0.2f, 1.0f };
+		static float[] LightDiffuse= { 1.0f, 1.0f, 1.0f, 1.0f }; 
+		static float[] LightPosition= { 0.0f, 0.0f, 0.75f, 1.0f };
+
+		static public void On()
+		{
+			gl.glLightfv(gl.GL_LIGHT1, gl.GL_AMBIENT, LightAmbient);	
+			gl.glLightfv(gl.GL_LIGHT1, gl.GL_DIFFUSE, LightDiffuse);
+			gl.glLightfv(gl.GL_LIGHT1, gl.GL_POSITION,LightPosition);
+			gl.glEnable(gl.GL_LIGHT1);
+			gl.glEnable(gl.GL_LIGHTING);
+		}
+
 	}
 	
 	//OpenGL Cover Data Class
@@ -176,9 +194,6 @@ namespace Banshee.Plugins.Fleow
 
 		public GLCoverList myCovers;		//covers gabbed from banshee database
 		private int step=0;				//steps
-		float[] LightAmbient= { 0.2f, 0.2f, 0.2f, 1.0f };
-		float[] LightDiffuse= { 1.0f, 1.0f, 1.0f, 1.0f }; 
-		float[] LightPosition= { 0.0f, 0.0f, 0.75f, 1.0f };
 
 		//class constructor
 		public Engine() : base(attrlist)
@@ -229,13 +244,8 @@ namespace Banshee.Plugins.Fleow
 			// Really Nice Perspective Calculations
 			gl.glHint(gl.GL_PERSPECTIVE_CORRECTION_HINT, gl.GL_NICEST);
 			gl.glHint(gl.GL_POLYGON_SMOOTH_HINT, gl.GL_NICEST);
-
-			//light on	
-			gl.glLightfv(gl.GL_LIGHT1, gl.GL_AMBIENT, LightAmbient);	
-			gl.glLightfv(gl.GL_LIGHT1, gl.GL_DIFFUSE, LightDiffuse);
-			gl.glLightfv(gl.GL_LIGHT1, gl.GL_POSITION,LightPosition);
-			gl.glEnable(gl.GL_LIGHT1);
-			gl.glEnable(gl.GL_LIGHTING);	
+	
+			Lights.On();										// Lights on
 			
 			return true;
 		}
@@ -253,8 +263,7 @@ namespace Banshee.Plugins.Fleow
 		void OnExposed (object o, EventArgs e)
 		{
 		
-			if (this.MakeCurrent() == 0)
-				return;
+			if (this.MakeCurrent() == 0) return;
 			
 			// Clear The Screen And The Depth Buffer
 			gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT);
