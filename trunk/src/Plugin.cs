@@ -27,7 +27,8 @@ namespace Banshee.Plugins.Fleow
 			get
 			{
 				return new string []{
-					"Lukasz Wisniewski <vishna@gazeta.pl>"
+					"Lukasz Wisniewski <vishna@gazeta.pl>",
+					"Dariusz Lisowski"
 				};
 			}
 		}

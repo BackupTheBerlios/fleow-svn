@@ -246,7 +246,11 @@ namespace Banshee.Plugins.Fleow
 			gl.glHint(gl.GL_PERSPECTIVE_CORRECTION_HINT, gl.GL_NICEST);
 			gl.glHint(gl.GL_POLYGON_SMOOTH_HINT, gl.GL_NICEST);
 	
-			Lights.On();										// Lights on
+			//Lights.On();										// Lights on
+
+			//gl.glEnable(gl.GL_BLEND);
+			//gl.glDisable(gl.GL_DEPTH_TEST);
+			//gl.glBlendFunc(gl.GL_SRC_COLOR,gl.GL_ONE_MINUS_SRC_COLOR);						// Set The Blending Function For Translucency
 			
 			return true;
 		}
@@ -275,7 +279,9 @@ namespace Banshee.Plugins.Fleow
 
 			if(myCovers!=null)
 			{
-				for(int i=0;i<myCovers.Count;i++)
+				for(int i=0;i<myCovers.current;i++)
+					DrawCover(myCovers.item(i));
+				for(int i=myCovers.Count-1;i>=myCovers.current;i--)
 					DrawCover(myCovers.item(i));
 			}
 			
@@ -289,6 +295,12 @@ namespace Banshee.Plugins.Fleow
 			gl.glTranslatef(cover.x,cover.y,cover.z);
 			gl.glRotatef(cover.angle,0.0f,1.0f,0.0f);
 
+			float br = 1;
+			if(Math.Abs(cover.x)>2.0f)
+			{
+				br = (float)Math.Exp(-4*(Math.Abs(cover.x)-2.0f));
+			}
+			gl.glColor3f(br, br, br);							// Manipulate Brightness
 			gl.glBindTexture(gl.GL_TEXTURE_2D, cover.texture);
 			gl.glBegin(gl.GL_QUADS);
 
