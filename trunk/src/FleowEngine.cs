@@ -24,6 +24,11 @@ namespace Banshee.Plugins.Fleow
 		static float cam_ydistance = -1.23f;
 		static float cam_angle = 18;
 
+		public static void Offset(float xang, float yang)
+		{
+			SetPos(cam_angle+yang,cam_zdistance);
+		}
+
 		public static void SetPos(float _cam_angle,float _cam_distance)
 		{
 			cam_angle = _cam_angle;
@@ -195,15 +200,31 @@ namespace Banshee.Plugins.Fleow
 	  	};
 
 		public GLCoverList myCovers;		//covers gabbed from banshee database
+		double beginX = 0;
+		double beginY = 0;
+		bool button1Pressed = false;
 
 		//class constructor
 		public Engine() : base(attrlist)
 		{
+			this.Events |=
+	    		Gdk.EventMask.Button1MotionMask |
+		    	Gdk.EventMask.Button2MotionMask |
+	    		Gdk.EventMask.ButtonPressMask |
+	    		Gdk.EventMask.ButtonReleaseMask |
+	    		Gdk.EventMask.VisibilityNotifyMask |
+	    		Gdk.EventMask.PointerMotionMask |
+	    		Gdk.EventMask.PointerMotionHintMask ;
+
 			// Set some event handlers
 			this.ExposeEvent += OnExposed;
 			this.Realized += OnRealized;
 			this.Unrealized += OnUnrealized;
 			this.ConfigureEvent += OnConfigure;
+
+			this.ButtonPressEvent += OnButtonPress;
+			this.ButtonReleaseEvent += OnButtonRelease;
+			this.MotionNotifyEvent += OnMotionNotify;
 		}
 		
 		// This method is called "ReSizeGLScene" in the NeHe lessons
@@ -386,5 +407,55 @@ namespace Banshee.Plugins.Fleow
 			}
 		}
 
+		// Mouse Events
+		public void OnMotionNotify (object o, Gtk.MotionNotifyEventArgs e)
+		{
+			int ix, iy;
+			double x, y;
+			Gdk.ModifierType m;
+			
+			// Find the current mouse X and Y positions
+			if (e.Event.IsHint) 
+			{
+				e.Event.Window.GetPointer(out ix, out iy, out m);
+				x = (double)ix;
+				y = (double)iy;
+			} 
+			else 
+			{
+	    		x = e.Event.X;
+	    		y = e.Event.Y;
+	  		}
+			if(button1Pressed)
+			{
+				Cam.Offset((float)(x-beginX),(float)(y-beginY));
+				this.QueueDraw();
+			}
+			beginX = x;
+			beginY = y;
+			
+		}
+
+		void OnButtonPress (object o, Gtk.ButtonPressEventArgs e)
+		{
+			if(e.Event.Button == 1)
+			{
+				button1Pressed = true;
+				
+				/* potential beginning of drag, reset mouse position */
+				beginX = e.Event.X;
+				beginY = e.Event.Y;
+				return;
+			}
+		}
+
+		void OnButtonRelease (object o, Gtk.ButtonReleaseEventArgs e)
+		{
+			if(e.Event.Button == 1)
+			{
+				button1Pressed = false;
+			}
+		}
+		// End of Mouse Events
 	}
 }
