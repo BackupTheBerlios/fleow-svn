@@ -4,6 +4,10 @@ SOURCES = \
 	$(srcdir)/Plugin.cs \
 	$(srcdir)/FleowPane.cs \
 	$(srcdir)/FleowEngine.cs \
+	$(srcdir)/FleowEngineCam.cs \
+	$(srcdir)/FleowEngineLights.cs \
+	$(srcdir)/FleowEngineCovers.cs \
+	$(srcdir)/FleowConfigDialog.cs \
 	$(srcdir)/FleowDatabase.cs
 
 plugindir = $(PLUGINDIR)

@@ -76,6 +76,12 @@ namespace Banshee.Plugins.Fleow
 				break;
 			}
 		}
+
+		// --------------------------------------------------------------- //
+
+        public override Gtk.Widget GetConfigurationWidget() {
+			return new FleowConfigPage(this);
+        }
 	}
 
 }
