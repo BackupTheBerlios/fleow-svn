@@ -13,6 +13,7 @@ namespace Banshee.Plugins.Fleow
 		
 	
 		private CheckButton animation;
+		private CheckButton lights;
 
         private FleowPlugin plugin;
 
@@ -30,19 +31,24 @@ namespace Banshee.Plugins.Fleow
             box.Spacing = 5;
 
 			animation = new CheckButton("Disable animations");
+			lights = new CheckButton("Lights");
 
-			animation.Toggled += toggled;
+			lights.Toggled += lightstoggled;
 
 			box.PackStart(animation, false, false, 0);
+			box.PackStart(lights, false, false, 0);
             PackStart(box, false, false, 0);
             
             ShowAll();
         }
 
 		// Event triggered when the check button is toggled
-		private void toggled(object o, EventArgs args) 
+		private void lightstoggled(object o, EventArgs args) 
 		{
-			Console.WriteLine("Fleow ConfigurationWiget not yet fully implemented!");
+			if (((ToggleButton) o).Active)
+				Lights.On();
+			else
+				Lights.Off();
 		}
 
 

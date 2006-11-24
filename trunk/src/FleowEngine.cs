@@ -42,6 +42,7 @@ namespace Banshee.Plugins.Fleow
 	  	};
 
 		public GLCoverList myCovers;		//covers gabbed from banshee database
+		bool lights=false;
 		double beginX = 0;
 		double beginY = 0;
 		bool button1Pressed = false;
@@ -109,7 +110,10 @@ namespace Banshee.Plugins.Fleow
 			gl.glHint(gl.GL_PERSPECTIVE_CORRECTION_HINT, gl.GL_NICEST);
 			gl.glHint(gl.GL_POLYGON_SMOOTH_HINT, gl.GL_NICEST);
 	
-			//Lights.On();										// Lights on
+			if(lights)
+			{
+				Lights.On();										// Lights on
+			}
 
 			//gl.glEnable(gl.GL_BLEND);
 			//gl.glDisable(gl.GL_DEPTH_TEST);

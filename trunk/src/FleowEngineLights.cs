@@ -15,11 +15,17 @@ namespace Banshee.Plugins.Fleow
 
 		static public void On()
 		{
-			gl.glLightfv(gl.GL_LIGHT1, gl.GL_AMBIENT, LightAmbient);	
+			//gl.glLightfv(gl.GL_LIGHT1, gl.GL_AMBIENT, LightAmbient);	
 			gl.glLightfv(gl.GL_LIGHT1, gl.GL_DIFFUSE, LightDiffuse);
 			gl.glLightfv(gl.GL_LIGHT1, gl.GL_POSITION,LightPosition);
 			gl.glEnable(gl.GL_LIGHT1);
 			gl.glEnable(gl.GL_LIGHTING);
+		}
+
+		static public void Off()
+		{
+			gl.glDisable(gl.GL_LIGHT1);
+			gl.glDisable(gl.GL_LIGHTING);
 		}
 
 	}
