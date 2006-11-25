@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using Tao.OpenGl;
 using Tao.DevIl;
 
@@ -47,26 +48,36 @@ namespace Banshee.Plugins.Fleow
 	public class GLCoverList : CoverList
 	{
 		int target = 0;			// target index
-		public int offset = 0;		// target index
+		public int offset = 0;		// offset
 		static float c = 1.2f;		// center distance
 		static float d = 0.2f;		// cover  distance
 		static float angle = 60;	// default angle
 		static float depth = 0.5f;	// default depth
 		static int spf = 25;		// steps per flip
 		static int step = 0;		// step
+		Queue myQueue;				// queue providing data sync with timeouts
 
 		public GLCoverList() : base()
 		{
+			myQueue = new Queue();
 			current = Count/2;
 			AlignToGrid();
 		}
 
 		public void MakeNewTarget(int offset)
 		{
-			target = current + offset;
-			if(target<0) target = 0;
-			else if(target>=Count) target = (Count-1);
-			this.offset = target - current;
+			myQueue.Enqueue(offset);
+			if(myQueue.Count>1)
+			{
+				/*tutaj chyba nic*/
+			}
+			else
+			{
+				target = (target==0) ? current + offset : target + offset;
+				if(target<0) target = 0;
+				else if(target>=Count) target = (Count-1);
+				this.offset = target - current;
+			}
 		}
 
 		public void AlignToGrid()
@@ -94,8 +105,17 @@ namespace Banshee.Plugins.Fleow
 			else
 			{
 				current = target;
-				AlignToGrid();
 				step=0;
+				myQueue.Dequeue();	// one offset done
+				if(myQueue.Count>0)
+				{
+					int off = (int)myQueue.Peek();
+					target = (target==0) ? current + off : target + off;
+					if(target<0) target = 0;
+					else if(target>=Count) target = (Count-1);
+					this.offset = target - current;
+				}
+				else AlignToGrid();
 				return false;
 			}
 			return true;

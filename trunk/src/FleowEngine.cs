@@ -206,7 +206,7 @@ namespace Banshee.Plugins.Fleow
 			return ret;
 		}
 
-		public void OnRotRPress (object o, System.EventArgs e)
+		public void OnRotLPress (object o, System.EventArgs e)
 		{
 			if((myCovers.current+1)<myCovers.Count)
 			{
@@ -221,7 +221,7 @@ namespace Banshee.Plugins.Fleow
 			//doRotate = false;
 		}
 
-		public void OnRotLPress (object o, System.EventArgs e)
+		public void OnRotRPress (object o, System.EventArgs e)
 		{
 			if(myCovers.current>0)
 			{
