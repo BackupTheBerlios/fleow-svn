@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Data;
+using Mono.Unix;
 
 namespace Banshee.Plugins.Fleow
 {
@@ -13,9 +14,9 @@ namespace Banshee.Plugins.Fleow
 
 		public Cover(){}
 
-		public Cover(string ASIN, string artist, string albumtitle)
+		public Cover(string image, string artist, string albumtitle)
 		{
-				image = System.Environment.GetEnvironmentVariable("HOME") + "/.gnome2/banshee/covers/" + ASIN + ".jpg";
+				//image = System.Environment.GetEnvironmentVariable("HOME") + "/.gnome2/banshee/covers/" + ASIN + ".jpg";
 				LoadTexture(image);
 				this.artist = artist;
 				this.albumtitle = albumtitle;
@@ -29,13 +30,44 @@ namespace Banshee.Plugins.Fleow
 
 		public CoverList()
 		{
-			IDataReader reader = Banshee.Base.Globals.Library.Db.Query("SELECT DISTINCT ASIN,Artist,AlbumTitle FROM Tracks ORDER BY Artist");
+			IDataReader reader = Banshee.Base.Globals.Library.Db.Query("SELECT DISTINCT Artist,AlbumTitle FROM Tracks ORDER BY Artist");
         	while(reader.Read()) 
-			{
-				string tmp=(string)reader["ASIN"];
-				if(tmp!="NOTFOUND" && !string.IsNullOrEmpty(tmp) )
+			{				
+				string artist=(string)reader["Artist"];
+				string album=(string)reader["AlbumTitle"];
+				string image_path="";
+
+				IDataReader imgreader = Banshee.Base.Globals.Library.Db.Query("SELECT DISTINCT ASIN FROM Tracks WHERE Artist LIKE \""+artist+"\" AND AlbumTitle LIKE \""+album+"\"");
+				while(imgreader.Read())
 				{
-					Add(new Cover(tmp,(string)reader["Artist"],(string)reader["AlbumTitle"]));
+					image_path = System.Environment.GetEnvironmentVariable("HOME") + "/.gnome2/banshee/covers/" + (string)imgreader["ASIN"] + ".jpg";
+					if((new UnixFileInfo(image_path)).Exists)break;
+				}
+
+
+				if((new UnixFileInfo(image_path)).Exists)
+				{
+					Add(new Cover(image_path,artist,album));
+				}
+				else
+				{
+					string directory=(string)Banshee.Base.Globals.Library.Db.QuerySingle("SELECT Uri FROM Tracks WHERE Artist LIKE \""+artist+"\" AND AlbumTitle LIKE \""+album+"\" LIMIT 1");
+					//remove (replace safer) "file://"
+					directory=directory.Remove(0,7);
+					//replace "%20" with white spaces
+					directory=directory.Replace("%20"," ");
+					directory = (new UnixFileInfo(directory)).DirectoryName;
+				
+					//load local cover.jpg or folder.jpg
+					if((new UnixFileInfo(directory+"/cover.jpg")).Exists)
+					{
+						Add(new Cover(directory+"/cover.jpg",artist,album));
+					}
+					else if((new UnixFileInfo(directory+"/folder.jpg")).Exists)
+					{
+						Add(new Cover(directory+"/folder.jpg",artist,album));
+					}
+					
 				}
 			}	
 		}
