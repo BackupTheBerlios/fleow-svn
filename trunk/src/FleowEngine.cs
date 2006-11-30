@@ -158,27 +158,32 @@ namespace Banshee.Plugins.Fleow
 		void DrawCover (Cover cover)
 		{
 			//Draw Cover wireframe + texture
-			gl.glPushMatrix();
-			gl.glTranslatef(cover.x,cover.y,cover.z);
-			gl.glRotatef(cover.angle,0.0f,1.0f,0.0f);
-
-			float br = 1;
-			if(Math.Abs(cover.x)>2.0f)
+			if(Math.Abs(cover.x)<3.0f)
 			{
-				br = (float)Math.Exp(-4*(Math.Abs(cover.x)-2.0f));
-			}
-			gl.glColor3f(br, br, br);							// Manipulate Brightness
-			gl.glBindTexture(gl.GL_TEXTURE_2D, cover.texture);
-			gl.glBegin(gl.GL_QUADS);
+				
+				gl.glPushMatrix();
+				gl.glTranslatef(cover.x,cover.y,cover.z);
+				gl.glRotatef(cover.angle,0.0f,1.0f,0.0f);
 
-				gl.glNormal3f( 0.0f, 0.0f, 1.0f);
-				gl.glTexCoord2f(-1, 1); gl.glVertex3f( -1.0f, -1.0f, 0.0f);
-				gl.glTexCoord2f(0, 1); gl.glVertex3f( 1.0f, -1.0f, 0.0f);
-				gl.glTexCoord2f(0, 0); gl.glVertex3f( 1.0f, 1.0f, 0.0f);
-				gl.glTexCoord2f(-1, 0); gl.glVertex3f( -1.0f, 1.0f, 0.0f);
+				float br = 1;
+				if(Math.Abs(cover.x)>2.0f)
+				{
+					br = (float)Math.Exp(-4*(Math.Abs(cover.x)-2.0f));
+				}
+				gl.glColor3f(br, br, br);							// Manipulate Brightness
+				gl.glBindTexture(gl.GL_TEXTURE_2D, cover.texture);
+				gl.glBegin(gl.GL_QUADS);
+
+					gl.glNormal3f( 0.0f, 0.0f, 1.0f);
+					gl.glTexCoord2f(-1, 1); gl.glVertex3f( -1.0f, -1.0f, 0.0f);
+					gl.glTexCoord2f(0, 1); gl.glVertex3f( 1.0f, -1.0f, 0.0f);
+					gl.glTexCoord2f(0, 0); gl.glVertex3f( 1.0f, 1.0f, 0.0f);
+					gl.glTexCoord2f(-1, 0); gl.glVertex3f( -1.0f, 1.0f, 0.0f);
 			
-			gl.glEnd();
-			gl.glPopMatrix();
+				gl.glEnd();
+				gl.glPopMatrix();
+
+			}
 		}
 
 		private void LoadTextures()
