@@ -43,13 +43,18 @@ namespace Banshee.Plugins.Fleow
 
 		public GLCoverList myCovers;		//covers gabbed from banshee database
 		bool lights=false;
-		double beginX = 0;
-		double beginY = 0;
-		bool button1Pressed = false;
+		bool selection_mode=false;
 
 		//class constructor
 		public Engine() : base(attrlist)
 		{
+			// Set some event handlers
+			this.ExposeEvent += OnExposed;
+			this.Realized += OnRealized;
+			this.Unrealized += OnUnrealized;
+			this.ConfigureEvent += OnConfigure;
+
+			// Add mouse events
 			this.Events |=
 	    		Gdk.EventMask.Button1MotionMask |
 		    	Gdk.EventMask.Button2MotionMask |
@@ -58,12 +63,6 @@ namespace Banshee.Plugins.Fleow
 	    		Gdk.EventMask.VisibilityNotifyMask |
 	    		Gdk.EventMask.PointerMotionMask |
 	    		Gdk.EventMask.PointerMotionHintMask ;
-
-			// Set some event handlers
-			this.ExposeEvent += OnExposed;
-			this.Realized += OnRealized;
-			this.Unrealized += OnUnrealized;
-			this.ConfigureEvent += OnConfigure;
 
 			this.ButtonPressEvent += OnButtonPress;
 			this.ButtonReleaseEvent += OnButtonRelease;
@@ -136,41 +135,127 @@ namespace Banshee.Plugins.Fleow
 		{
 		
 			if (this.MakeCurrent() == 0) return;
-			
+
 			// Clear The Screen And The Depth Buffer
 			gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT);
 			gl.glLoadIdentity();
+
+
+			// Establish a buffer for selection mode values
+			uint[] selectBuf = new uint[64];
+
+			if(selection_mode)
+			// Start Picking
+			{
+				// Define storage for hit records
+				gl.glSelectBuffer (64, selectBuf);
+
+				// Enter selection mode
+				gl.glRenderMode(gl.GL_SELECT);
+
+				gl.glMatrixMode(gl.GL_PROJECTION);				// Select The Projection Matrix
+				gl.glPushMatrix();                              // Save our state
+				gl.glLoadIdentity();							// Reset The Projection Matrix
+
+				// Get the viewport
+				int[] viewport = new int[4];
+				gl.glGetIntegerv(gl.GL_VIEWPORT, viewport);
+
+				// Select picking area
+				glu.gluPickMatrix(beginX, viewport[3] - beginY, 5, 5, viewport);
+
+
+				int height = this.Allocation.Height,
+				width  = this.Allocation.Width;
+				
+				if (height==0)									// Prevent A Divide By Zero By
+				{
+					height=1;									// Making Height Equal One
+				}
+
+				glu.gluPerspective(45f,(float)width/(float)height,0.1f,1000f);
+				gl.glMatrixMode(gl.GL_MODELVIEW);
+
+			}
 			
 			// Camera set view
 			Cam.SetView();
 
+			// Create empty Name Stack
+			gl.glInitNames();
+
 			if(myCovers!=null)
 			{
-				for(int i=0;i<myCovers.current;i++)
-					DrawCover(myCovers.item(i));
-				for(int i=myCovers.Count-1;i>=myCovers.current;i--)
-					DrawCover(myCovers.item(i));
+				for(int i=0;i<myCovers.Count;i++)
+					DrawCover(myCovers.item(i),i);
 			}
 			
+			if(selection_mode)
+			// Stop picking
+			{
+					selection_mode = false;
+					int hits;
+	
+					// restoring the original projection matrix
+					gl.glMatrixMode(gl.GL_PROJECTION);
+					gl.glPopMatrix();
+					gl.glMatrixMode(gl.GL_MODELVIEW);
+					gl.glFlush();
+	
+					// returning to normal rendering mode
+					hits = gl.glRenderMode(gl.GL_RENDER);
+	
+					// if there are hits process them
+					if (hits != 0)
+						processHits(hits,selectBuf);
+			}
+			else
 			this.SwapBuffers ();	// Show the newly displayed contents
 		}
 
-		void DrawCover (Cover cover)
+		// Seek for lowest depth value object's name
+		void processHits (int hits, uint[] buffer)
+		{
+			uint pointer=0;
+			uint name=(uint)myCovers.current;
+			uint minZ=0xffffffff;
+			for (int i = 0; i < hits; i++)
+			{
+				//Console.WriteLine(minZ+">"+buffer[pointer+2]);
+				uint numberOfNames = buffer[pointer];
+				if(minZ > buffer[pointer+2])
+				{
+					
+					minZ = buffer[pointer+2];
+					for(uint j=pointer+3; j < pointer+3+numberOfNames;j++)
+						name = buffer[j];
+				}
+				pointer += 3+numberOfNames;
+			}
+			if(name!=(uint)myCovers.current)
+				MoveToCover (myCovers.item((int)name).artist, myCovers.item((int)name).albumtitle);
+
+		}
+
+		void DrawCover (Cover cover,int name)
 		{
 			//Draw Cover wireframe + texture
 			if(Math.Abs(cover.x)<3.0f)
 			{
 				
 				gl.glPushMatrix();
+				
 				gl.glTranslatef(cover.x,cover.y,cover.z);
 				gl.glRotatef(cover.angle,0.0f,1.0f,0.0f);
 
 				float br = 1;
 				if(Math.Abs(cover.x)>2.0f)
 				{
-					br = (float)Math.Exp(-4*(Math.Abs(cover.x)-2.0f));
+					br = 1.0f - 1.0f*(Math.Abs(cover.x)-2.0f);
 				}
-				gl.glColor3f(br, br, br);							// Manipulate Brightness
+				gl.glColor3f(br, br, br);							// Manipulate Brightness At The Edges
+
+				gl.glPushName(name);
 				gl.glBindTexture(gl.GL_TEXTURE_2D, cover.texture);
 				gl.glBegin(gl.GL_QUADS);
 
@@ -181,6 +266,8 @@ namespace Banshee.Plugins.Fleow
 					gl.glTexCoord2f(-1, 0); gl.glVertex3f( -1.0f, 1.0f, 0.0f);
 			
 				gl.glEnd();
+				gl.glPopName();
+
 				gl.glPopMatrix();
 
 			}
@@ -259,6 +346,10 @@ namespace Banshee.Plugins.Fleow
 		}
 
 		// Mouse Events
+		double beginX = 0;
+		double beginY = 0;
+		bool button1Pressed = false;
+
 		public void OnMotionNotify (object o, Gtk.MotionNotifyEventArgs e)
 		{
 			int ix, iy;
@@ -305,6 +396,14 @@ namespace Banshee.Plugins.Fleow
 			if(e.Event.Button == 1)
 			{
 				button1Pressed = false;
+			}
+			else if(e.Event.Button == 3)
+			{
+				selection_mode=true;
+				this.QueueDraw();
+				//selection_mode=false;
+
+				//Console.WriteLine("Kliknieto: "+beginX+","+beginY+"\n");
 			}
 		}
 		// End of Mouse Events
