@@ -17,20 +17,23 @@ using Banshee.Base;
 
 namespace Banshee.Plugins.Fleow
 {	
-	//Class inherited from GLArea, therefore can be easilly added as widget in gtk apps
+	/// <summary>
+	/// Class inherited from GLArea, therefore can be easilly added as widget in gtk apps
+	/// </summary>
 	public class Engine : GLArea
 	{
-		/*	attrList
-		 *      Specifies a list of Boolean attributes and enum/integer
-		 *      attribute/value pairs. The last attribute must be zero or
-		 *      _GDK_GL_CONFIGS.None.
-		 *      
-		 *      See glXChooseVisual man page for explanation of
-		 *      attrList.
-		 *      
-		 *      http://www.xfree86.org/4.4.0/glXChooseVisual.3.html
-		 */
-		   
+		/// <summary>
+		///
+		///     Specifies a list of Boolean attributes and enum/integer
+		///     attribute/value pairs. The last attribute must be zero or
+		///      _GDK_GL_CONFIGS.None.
+		///     
+		///     See glXChooseVisual man page for explanation of
+		///     attrList.
+		///     
+		///     http://www.xfree86.org/4.4.0/glXChooseVisual.3.html
+		///
+		/// </summary>
 		static System.Int32[] attrlist = {
 		(int)GtkGL._GDK_GL_CONFIGS.Rgba,
 	   	(int)GtkGL._GDK_GL_CONFIGS.RedSize,1,
@@ -41,11 +44,16 @@ namespace Banshee.Plugins.Fleow
 		(int)GtkGL._GDK_GL_CONFIGS.None,
 	  	};
 
-		public GLCoverList myCovers;		//covers gabbed from banshee database
+		/// <summary>
+		/// Covers grabbed from banshee database
+		/// </summary>
+		public GLCoverList myCovers;
 		bool lights=false;
 		bool selection_mode=false;
 
-		//class constructor
+		/// <summary>
+		/// Class constructor
+		/// </summary>
 		public Engine() : base(attrlist)
 		{
 			// Set some event handlers
@@ -69,7 +77,9 @@ namespace Banshee.Plugins.Fleow
 			this.MotionNotifyEvent += OnMotionNotify;
 		}
 		
-		// This method is called "ReSizeGLScene" in the NeHe lessons
+		/// <summary>
+		/// This method is called "ReSizeGLScene" in the NeHe lessons
+		/// </summary>
 		void OnConfigure (object o, EventArgs e)
 		{
 			if( this.MakeCurrent() == 0) return;
@@ -94,6 +104,9 @@ namespace Banshee.Plugins.Fleow
 			gl.glLoadIdentity();		
 		}
 
+		/// <summary>
+		/// Initalizes GL mode
+		/// </summary>
 		bool InitGL()
 		{
 			if (this.MakeCurrent() == 0)
@@ -121,7 +134,9 @@ namespace Banshee.Plugins.Fleow
 			return true;
 		}
 		
-		// The correct time to init the gl window is at Realize time
+		/// <summary>
+		/// The correct time to init the gl window is at Realize time
+		/// </summary>
 		void OnRealized (object o, EventArgs e)
 		{
 			if(!InitGL())
@@ -130,7 +145,9 @@ namespace Banshee.Plugins.Fleow
 			else LoadTextures();
 		}
 
-		// This method is called "DrawGLScene" in NeHe tutorials	
+		/// <summary>
+		/// This method is used to draw whole GLScene
+		/// </summary>
 		void OnExposed (object o, EventArgs e)
 		{
 		
@@ -213,7 +230,9 @@ namespace Banshee.Plugins.Fleow
 			this.SwapBuffers ();	// Show the newly displayed contents
 		}
 
-		// Seek for lowest depth value object's name
+		/// <summary>
+		/// Seek for lowest depth value object's name (applies to GL_SELECT)
+		/// </summary>
 		void processHits (int hits, uint[] buffer)
 		{
 			uint pointer=0;
@@ -237,9 +256,14 @@ namespace Banshee.Plugins.Fleow
 
 		}
 
+		/// <summary>
+		/// Draw cover in GLScene
+		/// </summary>
+		/// <param name="cover"></param>
+		/// <param name="name">Cover int name (used with GL_SELECT)</param>
 		void DrawCover (Cover cover,int name)
 		{
-			//Draw Cover wireframe + texture
+			// Check if cover should actually be drawn
 			if(Math.Abs(cover.x)<3.0f)
 			{
 				
@@ -273,6 +297,9 @@ namespace Banshee.Plugins.Fleow
 			}
 		}
 
+		/// <summary>
+		/// Load Textures on startup
+		/// </summary>
 		private void LoadTextures()
 		{
 			//devil initializations ];>
@@ -291,6 +318,9 @@ namespace Banshee.Plugins.Fleow
 
 		// --------------------------------------------------------------- //
 
+		/// <summary>
+		/// Flip covers, normally executed in a loop in order to grant an animation effect
+		/// </summary>
 		private bool Flip()
 		{
 			bool ret = myCovers.AlignByStep();
@@ -298,6 +328,9 @@ namespace Banshee.Plugins.Fleow
 			return ret;
 		}
 
+		/// <summary>
+		/// Button '<' function
+		/// </summary>
 		public void OnRotLPress (object o, System.EventArgs e)
 		{
 			if((myCovers.current+1)<myCovers.Count)
@@ -313,6 +346,9 @@ namespace Banshee.Plugins.Fleow
 			//doRotate = false;
 		}
 
+		/// <summary>
+		/// Button '>' function
+		/// </summary>
 		public void OnRotRPress (object o, System.EventArgs e)
 		{
 			if(myCovers.current>0)
@@ -328,12 +364,20 @@ namespace Banshee.Plugins.Fleow
 			//doRotate = false;
 		}
 
+		/// <summary>
+		/// Button 'Play' function
+		/// </summary>
 		public void OnPlayPress (object o, EventArgs e)
 		{
 			int track = CoverList.GetTrackId(myCovers.item(myCovers.current));
 			if(track>0)PlayerEngineCore.OpenPlay(Globals.Library.GetTrack(track));
 		}
 
+		/// <summary>
+		/// Moves to cover given artist name and cover title
+		/// </summary>
+		/// <param name="artist">Artist name</param>
+		/// <param name="albumtitle">Album title</param>
 		public void MoveToCover (string artist, string albumtitle)
 		{
 			int offset = myCovers.Search(artist,albumtitle) - myCovers.current;
@@ -350,6 +394,9 @@ namespace Banshee.Plugins.Fleow
 		double beginY = 0;
 		bool button1Pressed = false;
 
+		/// <summary>
+		/// MotionNotify over GLScene support
+		/// </summary>
 		public void OnMotionNotify (object o, Gtk.MotionNotifyEventArgs e)
 		{
 			int ix, iy;
@@ -378,6 +425,9 @@ namespace Banshee.Plugins.Fleow
 			
 		}
 
+		/// <summary>
+		/// Mouse button pressed
+		/// </summary>
 		void OnButtonPress (object o, Gtk.ButtonPressEventArgs e)
 		{
 			if(e.Event.Button == 1)
@@ -391,6 +441,9 @@ namespace Banshee.Plugins.Fleow
 			}
 		}
 
+		/// <summary>
+		/// Mouse button released
+		/// </summary>
 		void OnButtonRelease (object o, Gtk.ButtonReleaseEventArgs e)
 		{
 			if(e.Event.Button == 1)

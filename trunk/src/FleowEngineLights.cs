@@ -6,13 +6,18 @@ using glu=Tao.OpenGl.Glu;
 
 namespace Banshee.Plugins.Fleow
 {
-	//Scene Lights
+	/// <summary>
+	/// Static Class for Scene Lights
+	/// </summary>
 	public static class Lights
 	{
 		static float[] LightAmbient= { 0.2f, 0.2f, 0.2f, 1.0f };
 		static float[] LightDiffuse= { 1.0f, 1.0f, 1.0f, 1.0f }; 
 		static float[] LightPosition= { 0.0f, 0.0f, 0.75f, 1.0f };
 
+		/// <summary>
+		/// Turns lights on
+		/// </summary>
 		static public void On()
 		{
 			//gl.glLightfv(gl.GL_LIGHT1, gl.GL_AMBIENT, LightAmbient);	
@@ -22,6 +27,9 @@ namespace Banshee.Plugins.Fleow
 			gl.glEnable(gl.GL_LIGHTING);
 		}
 
+		/// <summary>
+		/// Turns lights off
+		/// </summary>
 		static public void Off()
 		{
 			gl.glDisable(gl.GL_LIGHT1);

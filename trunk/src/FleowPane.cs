@@ -5,16 +5,24 @@ using GtkSharp;
 
 namespace Banshee.Plugins.Fleow
 {
+	/// <summary>
+	/// This class is main interface element containing buttons and cover visualisation widget
+	/// </summary>
 	public class FleowPane : Frame
 	{
-		//OpenGL _Engine_ class containing all render scene functions, initalizations & bindings
+		/// <summary>
+		/// OpenGL Engine class containing all render scene functions, initalizations & bindings
+		/// </summary>
 		public Engine myEngine;
 		
+		/// <summary>
+		/// Default class constructor
+		/// </summary>
 		public FleowPane()
 		{
 			//CreateWidget();
 
-			//Create openGL widget
+			// Create openGL widget
 			myEngine = new Engine ();
 			myEngine.SetSizeRequest (600, 300);
 

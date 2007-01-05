@@ -5,15 +5,26 @@ using Mono.Unix;
 
 namespace Banshee.Plugins.Fleow
 {
-	//contains info of a cover
+	/// <summary>
+	/// Contains info of a single cover plus inherited GLCover data
+	/// </summary>
 	public class Cover : GLCover
 	{
 		public string artist;
 		public string albumtitle;
 		public string image;
 
+		/// <summary>
+		/// Default constructor - does nothing
+		/// </summary>
 		public Cover(){}
 
+		/// <summary>
+		/// Creates Cover object given image path (front cover), artist name and album name
+		/// </summary>
+		/// <param name="image">Path to texture</param>
+		/// <param name="artist">Artist name</param>
+		/// <param name="albumtitle">Album title</param>
 		public Cover(string image, string artist, string albumtitle)
 		{
 				//image = System.Environment.GetEnvironmentVariable("HOME") + "/.gnome2/banshee/covers/" + ASIN + ".jpg";
@@ -23,11 +34,19 @@ namespace Banshee.Plugins.Fleow
 		}
 	}
 	
-	//container for covers, grabs info from sql banshee database
+	/// <summary>
+	/// Container for covers, grabs info from sql banshee database
+	/// </summary>
 	public class CoverList : ArrayList
 	{
-		public int current;					//currently selected cover from CoverList
+		/// <summary>
+		/// Currently selected cover from CoverList
+		/// </summary>
+		public int current;					
 
+		/// <summary>
+		/// Default constructor
+		/// </summary>
 		public CoverList()
 		{
 			IDataReader reader = Banshee.Base.Globals.Library.Db.Query("SELECT DISTINCT Artist,AlbumTitle FROM Tracks ORDER BY Artist");
@@ -72,17 +91,26 @@ namespace Banshee.Plugins.Fleow
 			}	
 		}
 
+		/// <summary>
+		/// Given selected cover index returns first available TrackId form BanseeDB
+		/// </summary>
 		public static int GetTrackId(Cover c)
-        {
-            object result = Banshee.Base.Globals.Library.Db.QuerySingle("SELECT TrackId FROM Tracks WHERE Artist LIKE \""+c.artist+"\" AND AlbumTitle LIKE \""+c.albumtitle+"\" LIMIT 1");
-            return result == null ? -1 : (int)result;
-        }
+		{
+			object result = Banshee.Base.Globals.Library.Db.QuerySingle("SELECT TrackId FROM Tracks WHERE Artist LIKE \""+c.artist+"\" AND AlbumTitle LIKE \""+c.albumtitle+"\" LIMIT 1");
+			return result == null ? -1 : (int)result;
+		}
 
+		/// <summary>
+		/// Returns cover object given its index
+		/// </summary>
 		public Cover item(int index)
 		{
 			return (Cover)this[index];
 		}
 
+		/// <summary>
+		/// Given artist name and album tile returns cover index
+		/// </summary>
 		public int Search(string artist,string albumtitle)
 		{
 			for(int i=0;i<Count;i++)

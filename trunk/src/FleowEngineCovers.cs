@@ -8,7 +8,9 @@ using glu=Tao.OpenGl.Glu;
 
 namespace Banshee.Plugins.Fleow
 {
-	//OpenGL Cover Data Class
+	/// <summary>
+	/// GL Cover Class, contains postion in 3D and binded texture id
+	/// </summary>
 	public class GLCover
 	{
 		public float x,y,z;
@@ -16,11 +18,18 @@ namespace Banshee.Plugins.Fleow
 		public int texture;
 		public bool hidden;
 
+		/// <summary>
+		/// Load texture from file
+		/// </summary>
+		/// <param name="filename">Name of the file to be loaded as texture</param>
 		public void LoadTexture(string filename)
 		{
 			texture = Ilut.ilutGLLoadImage(filename);
 		}
 
+		/// <summary>
+		/// If possible, unload texture and release memory.
+		/// </summary>
 		public void UnloadTexture()
 		{
 			if(texture!=-1)
