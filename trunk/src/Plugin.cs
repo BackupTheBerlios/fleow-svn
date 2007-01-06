@@ -4,6 +4,16 @@ using Mono.Unix;
 using Banshee.Base;
 using Banshee.Sources;
 using Banshee.MediaEngine;
+
+public static class PluginModuleEntry
+{
+    public static Type [] GetTypes()
+    {
+        return new Type [] {
+            typeof(Banshee.Plugins.Fleow.FleowPlugin)
+        };
+    }
+}
  
 namespace Banshee.Plugins.Fleow
 {
